@@ -9,13 +9,9 @@
  *  ESP8266-IP is the IP address of the ESP8266 module
  *  SVRPORT is the TCP port number the server listens for connections on
  */
-#include <OneWire.h>
 
 #include <ESP8266WiFi.h>
-#include <Wire.h>
-#include <DHT.h>
 
-#include <Adafruit_BMP085.h>
 #include <UtilityFunctions.h>
 
 extern "C" {

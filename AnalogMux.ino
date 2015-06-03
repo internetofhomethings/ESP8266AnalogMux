@@ -11,7 +11,6 @@
  */
 
 #include <ESP8266WiFi.h>
-
 #include <UtilityFunctions.h>
 
 extern "C" {

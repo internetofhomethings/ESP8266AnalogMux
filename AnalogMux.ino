@@ -21,8 +21,9 @@ extern "C" {
 #define SET_LED_OFF 0
 #define SET_LED_ON  1
 #define Get_SENSORS 2
+#define Get_ANALOG_VALUE 3
 
-#define SERBAUD 74880
+#define SERBAUD 115200
 #define SVRPORT 9701
 #define ONEJSON 0
 #define FIRSTJSON 1
@@ -48,7 +49,7 @@ const IPAddress ipsub(255,255,255,0);     //------------------------------------
 //globals
 int lc=0;
 bool complete=false;
-char Ain0[20],Ain1[20],Ain2[20],Ain3[20],Ain4[20],Ain5[20],Ain6[20],Ain7[20]; 
+char Ain0[20],Ain1[20],Ain2[20],Ain3[20],Ain4[20],Ain5[20],Ain6[20],Ain7[20],Ainx[20]; 
 uint32_t state=0;
 char szT[30];
 float Ain;
@@ -130,6 +131,73 @@ void startWIFI(void) {
 
 }
 
+void readAnalogIn(int chan) {
+  yield();
+  switch(chan) {
+    case 0:
+      //Set 8-1 amux to position 0
+      digitalWrite(AMUXSEL0, 0);
+      digitalWrite(AMUXSEL1, 0);
+      digitalWrite(AMUXSEL2, 0);
+      delay(100);
+     break;
+    case 1:
+      //Set 8-1 amux to position 1
+      digitalWrite(AMUXSEL0, 1);
+      digitalWrite(AMUXSEL1, 0);
+      digitalWrite(AMUXSEL2, 0);
+      delay(100);
+      break;
+    case 2:
+      //Set 8-1 amux to position 2
+      digitalWrite(AMUXSEL0, 0);
+      digitalWrite(AMUXSEL1, 1);
+      digitalWrite(AMUXSEL2, 0);
+      delay(100);
+      break;
+    case 3:
+      //Set 8-1 amux to position 3
+      digitalWrite(AMUXSEL0, 1);
+      digitalWrite(AMUXSEL1, 1);
+      digitalWrite(AMUXSEL2, 0);
+      delay(100);
+      break;
+    case 4:
+      //Set 8-1 amux to position 4
+      digitalWrite(AMUXSEL0, 0);
+      digitalWrite(AMUXSEL1, 0);
+      digitalWrite(AMUXSEL2, 1);
+      delay(100);
+      break;
+    case 5:
+      //Set 8-1 amux to position 5
+      digitalWrite(AMUXSEL0, 1);
+      digitalWrite(AMUXSEL1, 0);
+      digitalWrite(AMUXSEL2, 1);
+      delay(100);
+      break;
+    case 6:
+      //Set 8-1 amux to position 6
+      digitalWrite(AMUXSEL0, 0);
+      digitalWrite(AMUXSEL1, 1);
+      digitalWrite(AMUXSEL2, 1);
+      delay(100);
+      break;
+    case 7:
+      //Set 8-1 amux to position 7
+      digitalWrite(AMUXSEL0, 1);
+      digitalWrite(AMUXSEL1, 1);
+      digitalWrite(AMUXSEL2, 1);
+      delay(100);
+      break;
+    default:
+      break;
+  }
+  Ain = (float) analogRead(A0); //Read ESP8266 analog input
+  ftoa(Ain,Ainx, 2);            //Convert to ascii
+  ESP.wdtFeed(); 
+  yield();
+}
 
 void readSensorIsr() {
   yield();
@@ -322,14 +390,24 @@ void sysloop() {
   delay(100);
   
     // Match the request
-  int val;
+  int val,chan=0;
   if (req.indexOf("/gpio/0") != -1)
     val = SET_LED_OFF;
   else if (req.indexOf("/gpio/1") != -1)
     val = SET_LED_ON;
   else if (req.indexOf("/?request=GetSensors") != -1) {
     val = Get_SENSORS;
-    //Serial.println("Get Sensor Values Requested");
+  }
+  else if (req.indexOf("/ain") != -1) {
+    val = Get_ANALOG_VALUE;
+    if (req.indexOf("/ain/0") != -1) chan = 0;
+    if (req.indexOf("/ain/1") != -1) chan = 1;
+    if (req.indexOf("/ain/2") != -1) chan = 2;
+    if (req.indexOf("/ain/3") != -1) chan = 3;
+    if (req.indexOf("/ain/4") != -1) chan = 4;
+    if (req.indexOf("/ain/5") != -1) chan = 5;
+    if (req.indexOf("/ain/6") != -1) chan = 6;
+    if (req.indexOf("/ain/7") != -1) chan = 7;
   }  
   else {
     Serial.println("invalid request");
@@ -380,6 +458,15 @@ void sysloop() {
       yield();
       //ESP.wdtFeed(); 
       break;
+    case Get_ANALOG_VALUE:
+      // Read selected Analog input (0-7)
+      readAnalogIn(chan);
+      // Prepare the response for AIN Value
+      s += "Content-Type: text/html\r\n\r\n";
+      s += Ainx;
+      // Send the response to the client
+      client.print(s);
+      break;
     default:
       break;
    }
@@ -400,7 +487,8 @@ void sysloop() {
 }
 
 void setup() {
-  ESP.wdtEnable();
+  ESP.wdtEnable(WDTO_0MS);
+  //wdt_enable();
   Serial.begin(SERBAUD);
   delay(10);
   //complete=false;

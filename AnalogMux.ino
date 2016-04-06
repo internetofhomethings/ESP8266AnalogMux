@@ -5,6 +5,14 @@
  *  1.  http://ESP8266-IP:SVRPORT/gpio/0 will set the GPIO16 low,
  *  2.  http://ESP8266-IP:SVRPORT/gpio/1 will set the GPIO16 high
  *  3.  http://ESP8266-IP:SVRPORT/?request=GetSensors will return a json string with sensor (Ain) values
+ *  4.  http://ESP8266-IP:SVRPORT/ain/0 will read Analog input 0, returned as raw ADC count (0-1023, where 0=0V, 1023=3.3V)
+ *  5.  http://ESP8266-IP:SVRPORT/ain/1 will read Analog input 1, returned as raw ADC count (0-1023, where 0=0V, 1023=3.3V)
+ *  6.  http://ESP8266-IP:SVRPORT/ain/2 will read Analog input 2, returned as raw ADC count (0-1023, where 0=0V, 1023=3.3V)
+ *  7.  http://ESP8266-IP:SVRPORT/ain/3 will read Analog input 3, returned as raw ADC count (0-1023, where 0=0V, 1023=3.3V)
+ *  8.  http://ESP8266-IP:SVRPORT/ain/4 will read Analog input 4, returned as raw ADC count (0-1023, where 0=0V, 1023=3.3V)
+ *  9.  http://ESP8266-IP:SVRPORT/ain/5 will read Analog input 5, returned as raw ADC count (0-1023, where 0=0V, 1023=3.3V)
+ * 10.  http://ESP8266-IP:SVRPORT/ain/6 will read Analog input 6, returned as raw ADC count (0-1023, where 0=0V, 1023=3.3V)
+ * 11.  http://ESP8266-IP:SVRPORT/ain/7 will read Analog input 7, returned as raw ADC count (0-1023, where 0=0V, 1023=3.3V)
  *
  *  ESP8266-IP is the IP address of the ESP8266 module
  *  SVRPORT is the TCP port number the server listens for connections on
